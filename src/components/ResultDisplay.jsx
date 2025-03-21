@@ -52,7 +52,7 @@ function ResultDisplay({ result }) {
           {result.title && <h3 className="text-xl font-bold">Topic: {result.title}</h3>}
           {result.question && <h4 className="text-xl font"><span className="text-xl font-bold">Question:</span> {result.question}</h4>}
           {result.description && <p className="text-muted-foreground"><span className="text-xl font-bold">Description:</span> {result.description}</p>}
-
+          {result.result && <p className="text-muted-foreground"><span className="text-xl font-bold">Result:</span> {result.result}</p>}
           <div className="space-y-4">
             {result.steps.map((step, index) => (
               <div key={index} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">

@@ -97,7 +97,7 @@ function App() {
                   <CardDescription>Here's the solution to your problem</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResultDisplay result={result.result} />
+                  <ResultDisplay result={result?.result} />
                 </CardContent>
               </Card>
             </TabsContent>
