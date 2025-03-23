@@ -1,10 +1,12 @@
+// App.jsx
 import { useState, useEffect } from "react"
 import DrawingCanvas from "./components/DrawingCanvas"
+import ImageUploader from "./components/ImageUploader"
 import ResultDisplay from "./components/ResultDisplay"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { Button } from "./components/ui/button"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Upload, Palette } from "lucide-react"
 
 function App() {
   const [result, setResult] = useState(null)
@@ -12,7 +14,6 @@ function App() {
   const [activeTab, setActiveTab] = useState("draw")
   const [darkMode, setDarkMode] = useState(false)
 
-  // Initialize dark mode based on user preference
   useEffect(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
     setDarkMode(prefersDark)
@@ -38,16 +39,14 @@ function App() {
         body: JSON.stringify({ image: imageData }),
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to get response from server")
-      }
+      if (!response.ok) throw new Error("Failed to get response from server")
 
       const data = await response.json()
       setResult(data)
       setActiveTab("result")
     } catch (error) {
-      console.error("Error submitting drawing:", error)
-      alert("Failed to process your drawing. Please try again.")
+      console.error("Error submitting:", error)
+      alert("Failed to process your input. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -56,47 +55,87 @@ function App() {
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
       <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Smart Slate</h1>
-          {/* <Button variant="ghost" size="icon" onClick={toggleDarkMode} aria-label="Toggle dark mode">
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button> */}
-        </div>
+        <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Palette className="h-6 w-6 text-primary" aria-hidden="true" />
+            <span>Smart Slate</span>
+          </h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleDarkMode}
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ?
+              <Sun className="h-5 w-5" aria-hidden="true" /> :
+              <Moon className="h-5 w-5" aria-hidden="true" />}
+          </Button>
+        </nav>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <p className="text-center mb-8 text-muted-foreground">
-          Draw your problem on the canvas and get step-by-step solutions from Gen AI
-        </p>
+        <h2 className="text-center mb-8 text-muted-foreground text-lg sr-only">
+          Problem solving through drawing or image upload
+        </h2>
 
         <div className="w-full max-w-4xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="draw">Draw</TabsTrigger>
-              <TabsTrigger value="result" disabled={!result}>
-                Solution
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="draw" className="gap-2" aria-label="Drawing tab">
+                <Palette className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only md:not-sr-only">Draw</span>
+              </TabsTrigger>
+              <TabsTrigger value="upload" className="gap-2" aria-label="Upload tab">
+                <Upload className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only md:not-sr-only">Upload</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="result"
+                disabled={!result}
+                aria-label="Solution results"
+              >
+                <span className="sr-only md:not-sr-only">Solution</span>
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="draw">
+
+            {/* TabsContent remains same but with added aria-live regions */}
+            <TabsContent value="draw" aria-live="polite">
               <Card>
                 <CardHeader>
-                  <CardTitle>Draw Your Problem</CardTitle>
-                  <CardDescription>
-                    Use the pen tools to draw your problem. Click submit when you're ready.
+                  <CardTitle id="drawing-title">Draw Your Problem</CardTitle>
+                  <CardDescription id="drawing-description">
+                    Use the tools below to sketch your problem
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent aria-describedby="drawing-description">
                   <DrawingCanvas onSubmit={handleSubmit} isLoading={isLoading} />
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="result">
+
+            <TabsContent value="upload" aria-live="polite">
               <Card>
                 <CardHeader>
-                  <CardTitle>Solution</CardTitle>
-                  <CardDescription>Here's the solution to your problem</CardDescription>
+                  <CardTitle id="upload-title">Upload Image</CardTitle>
+                  <CardDescription id="upload-description">
+                    Upload an image of your problem
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent aria-describedby="upload-description">
+                  <ImageUploader onSubmit={handleSubmit} isLoading={isLoading} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="result" aria-live="polite">
+              <Card>
+                <CardHeader>
+                  <CardTitle id="result-title">AI Solution</CardTitle>
+                  <CardDescription id="result-description">
+                    Step-by-step explanation
+                  </CardDescription>
+                </CardHeader>
+                <CardContent aria-describedby="result-description">
                   <ResultDisplay result={result?.result} />
                 </CardContent>
               </Card>
@@ -107,7 +146,8 @@ function App() {
 
       <footer className="border-t mt-auto">
         <div className="container mx-auto px-4 py-4 text-center text-sm text-muted-foreground">
-          Smart Slate © {new Date().getFullYear()}
+          <p>Smart Slate © {new Date().getFullYear()}</p>
+          <p>AI-Powered Problem Solving</p>
         </div>
       </footer>
     </div>
@@ -115,4 +155,3 @@ function App() {
 }
 
 export default App
-

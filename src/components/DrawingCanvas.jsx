@@ -307,9 +307,6 @@ function DrawingCanvas({ onSubmit, isLoading }) {
     link.click()
   }, [drawHistory])
 
-  const toggleGrid = useCallback(() => {
-    setShowGrid((prev) => !prev)
-  }, [])
 
   // Add keyboard shortcuts
   useEffect(() => {
@@ -339,16 +336,11 @@ function DrawingCanvas({ onSubmit, isLoading }) {
         e.preventDefault()
         setActiveTool(TOOLS.PEN)
       }
-      // G for grid
-      else if (e.key === "g") {
-        e.preventDefault()
-        toggleGrid()
-      }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [handleUndo, handleReset, handleSubmit, toggleGrid])
+  }, [handleUndo, handleReset, handleSubmit])
 
   return (
     <div className="flex flex-col gap-4">
@@ -364,6 +356,8 @@ function DrawingCanvas({ onSubmit, isLoading }) {
           onTouchEnd={stopDrawing}
           className="cursor-crosshair"
           aria-label="Drawing canvas"
+          role="img"
+          aria-description="Draw your mathematical problem here"
         />
 
         {isLoading && (
@@ -430,10 +424,10 @@ function DrawingCanvas({ onSubmit, isLoading }) {
           <Slider
             value={[brushSize]}
             min={1}
-            max={20}
+            max={10}
             step={1}
             onValueChange={(value) => setBrushSize(value[0])}
-            className="flex-1"
+            className="flex-1 bg-gray-200"
           />
           <span className="text-sm w-8 text-right">{brushSize}px</span>
         </div>
@@ -462,16 +456,6 @@ function DrawingCanvas({ onSubmit, isLoading }) {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant={showGrid ? "secondary" : "outline"} size="sm" onClick={toggleGrid}>
-                  <Grid className="h-4 w-4 mr-2" />
-                  Grid
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Toggle grid (G)</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button variant="outline" size="sm" onClick={handleDownload} disabled={drawHistory.length === 0}>
                   <Download className="h-4 w-4 mr-2" />
                   Download
@@ -482,7 +466,7 @@ function DrawingCanvas({ onSubmit, isLoading }) {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button className="ml-auto" onClick={handleSubmit} disabled={isLoading || drawHistory.length === 0}>
+                <Button className="ml-auto bg-blue-700" onClick={handleSubmit} disabled={isLoading || drawHistory.length === 0}>
                   {isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
@@ -502,7 +486,7 @@ function DrawingCanvas({ onSubmit, isLoading }) {
         </div>
 
         <div className="text-xs text-muted-foreground mt-2">
-          <strong>Keyboard shortcuts:</strong> Pen (P), Eraser (E), Grid (G), Undo (Ctrl+Z), Reset (Esc), Submit
+          <strong>Keyboard shortcuts:</strong> Pen (P), Eraser (E), Undo (Ctrl+Z), Reset (Esc), Submit
           (Ctrl+Enter)
         </div>
       </div>
