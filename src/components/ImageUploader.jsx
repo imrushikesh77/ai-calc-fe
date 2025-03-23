@@ -4,7 +4,7 @@ import { useDropzone } from "react-dropzone"
 import { Button } from "./ui/button"
 import { Loader2, Upload } from "lucide-react"
 
-function ImageUploader({ onSubmit, isLoading }) {
+function ImageUploader({ onSubmit, isLoading, comment, setComment }) {
     const [preview, setPreview] = useState(null)
     const [error, setError] = useState("")
 
@@ -78,13 +78,35 @@ function ImageUploader({ onSubmit, isLoading }) {
                 </div>
             </div>
 
+            <div className="space-y-2">
+                <label
+                    htmlFor="image-comment"
+                    className="text-sm font-medium"
+                >
+                    Add Comment (optional):
+                </label>
+                <input
+                    id="image-comment"
+                    type="text"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Describe your image..."
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                    aria-label="Add comment about your image"
+                    maxLength={200}
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                    {comment.length}/200 characters
+                </p>
+            </div>
+
             {error && <p className="text-destructive text-sm text-center">{error}</p>}
 
-            <div className="flex justify-center gap-4 bg-blue-700 rounded-2xl w-full">
+            <div className="flex justify-center gap-4  w-full">
                 <Button
                     onClick={handleSubmit}
                     disabled={!preview || isLoading}
-                    className="w-full max-w-xs"
+                    className="w-full max-w-xs bg-blue-700 rounded-2xl"
                 >
                     {isLoading ? (
                         <>

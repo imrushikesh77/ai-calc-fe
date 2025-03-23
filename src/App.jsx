@@ -13,6 +13,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("draw")
   const [darkMode, setDarkMode] = useState(false)
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -36,7 +37,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ image: imageData }),
+        body: JSON.stringify({ image: imageData, comment }),
       })
 
       if (!response.ok) throw new Error("Failed to get response from server")
@@ -108,7 +109,7 @@ function App() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent aria-describedby="drawing-description">
-                  <DrawingCanvas onSubmit={handleSubmit} isLoading={isLoading} />
+                  <DrawingCanvas onSubmit={handleSubmit} isLoading={isLoading} comment={comment} setComment={setComment} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -122,7 +123,7 @@ function App() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent aria-describedby="upload-description">
-                  <ImageUploader onSubmit={handleSubmit} isLoading={isLoading} />
+                  <ImageUploader onSubmit={handleSubmit} isLoading={isLoading} comment={comment} setComment={setComment} />
                 </CardContent>
               </Card>
             </TabsContent>

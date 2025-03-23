@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback } from "react"
 import { Button } from "./ui/button"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { Slider } from "./ui/slider"
-import { Undo2, RotateCcw, Send, Download, Grid, Eraser, Pencil } from "lucide-react"
+import { Undo2, RotateCcw, Send, Download, Eraser, Pencil } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 
 const COLORS = [
@@ -19,7 +19,7 @@ const TOOLS = {
   ERASER: "eraser",
 }
 
-function DrawingCanvas({ onSubmit, isLoading }) {
+function DrawingCanvas({ onSubmit, isLoading, comment, setComment }) {
   const canvasRef = useRef(null)
   const contextRef = useRef(null)
   const [isDrawing, setIsDrawing] = useState(false)
@@ -366,7 +366,27 @@ function DrawingCanvas({ onSubmit, isLoading }) {
           </div>
         )}
       </div>
-
+      <div className="space-y-2">
+        <label
+          htmlFor="drawing-comment"
+          className="text-sm font-medium"
+        >
+          Add Comment (optional):
+        </label>
+        <input
+          id="drawing-comment"
+          type="text"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Describe your drawing..."
+          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+          aria-label="Add comment about your drawing"
+          maxLength={200}
+        />
+        <p className="text-xs text-muted-foreground text-right">
+          {comment.length}/200 characters
+        </p>
+      </div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-sm font-medium">Tools:</span>
