@@ -29,7 +29,7 @@ function App() {
   const handleSubmit = async (imageData) => {
     setIsLoading(true)
     try {
-      const backendUrl = import.meta.env.REACT_APP_BACKEND_URL || "http://localhost:6277/calculate"
+      const backendUrl = import.meta.env.VITE_REACT_APP_BACKEND_URL || "http://localhost:6277/calculate"
       const response = await fetch(backendUrl, {
         method: "POST",
         headers: {
