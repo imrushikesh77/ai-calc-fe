@@ -8,6 +8,9 @@ function ResultDisplay({ result }) {
   const [viewMode, setViewMode] = useState("formatted")
   const [copied, setCopied] = useState(false)
   const [isExpanded, setIsExpanded] = useState({})
+  const [expandedSteps, setExpandedSteps] = useState({});
+  const [viewAll, setViewAll] = useState(false);
+
   // console.log(result)
   useEffect(() => {
     if (copied) {
@@ -32,17 +35,37 @@ function ResultDisplay({ result }) {
     }))
   }
 
+  const toggleStep = (index) => {
+    setExpandedSteps(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
+  const toggleViewAll = () => {
+    if (viewAll) {
+      setExpandedSteps({});
+    } else {
+      const newExpanded = {};
+      result.steps?.forEach((_, index) => {
+        newExpanded[index] = true;
+      });
+      setExpandedSteps(newExpanded);
+    }
+    setViewAll(!viewAll);
+  };
+
   const replacements = {
-    '∫': '∫',
-    '^2': '²',
-    '^3': '³',
-    '/': '÷',
-    '*': '×',
-    'pi': 'π',
-    'sqrt': '√',
-    'log': 'log',
-    'ln': 'ln'
-  }
+    '\\*': '×',       // Escaped * for multiplication
+    '\\^2': '²',      // Escaped ^ for exponents
+    '\\^3': '³',
+    '\\/': '÷',       // Escaped / for division
+    '\\bpi\\b': 'π',  // Word boundaries for pi
+    '\\bsqrt\\b': '√',
+    '\\blog\\b': 'log',
+    '\\bln\\b': 'ln',
+    '∫': '∫'
+  };
 
   const renderFormatted = () => {
     // Handle different possible response structures
@@ -53,11 +76,37 @@ function ResultDisplay({ result }) {
           {result.question && <h4 className="text-xl font"><span className="text-xl font-bold">Question:</span> {result.question}</h4>}
           {result.description && <p className="text-muted-foreground"><span className="text-xl font-bold">Description:</span> {result.description}</p>}
           {result.result && <p className="text-muted-foreground"><span className="text-xl font-bold">Result:</span> {result.result}</p>}
+          {result.steps.length > 1 && (
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleViewAll}
+              >
+                {viewAll ? <Check className="h-4 w-4 mr-2" /> : null}
+                {viewAll ? "Collapse All" : "View All Steps"}
+              </Button>
+            </div>
+          )}
           <div className="space-y-4">
             {result.steps.map((step, index) => (
-              <div key={index} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                <h4 className="font-medium mb-2">Step {index + 1}</h4>
-                <p>{step}</p>
+              <div
+                key={index}
+                className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => !viewAll && toggleStep(index)}
+              >
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium mb-2">Step {index + 1}</h4>
+                  {!viewAll && result.steps.length > 1 && (
+                    <span>{expandedSteps[index] ? '▼' : '▶'}</span>
+                  )}
+                </div>
+                {(viewAll || expandedSteps[index]) && (
+                  <p>
+                    {Object.entries(replacements).reduce((str, [key, value]) =>
+                      str.replace(new RegExp(key, 'g'), value), step)}
+                  </p>
+                )}
               </div>
             ))}
           </div>

@@ -6,7 +6,8 @@ import ResultDisplay from "./components/ResultDisplay"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { Button } from "./components/ui/button"
-import { Moon, Sun, Upload, Palette } from "lucide-react"
+import { Moon, Sun, Upload, Palette, Pi } from "lucide-react"
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const [result, setResult] = useState(null)
@@ -95,6 +96,7 @@ function App() {
                 disabled={!result}
                 aria-label="Solution results"
               >
+                <Pi className="h-4 w-4" aria-hidden="true" />
                 <span className="sr-only md:not-sr-only">Solution</span>
               </TabsTrigger>
             </TabsList>
@@ -151,6 +153,7 @@ function App() {
           <p>AI-Powered Problem Solving</p>
         </div>
       </footer>
+      <Analytics />
     </div>
   )
 }
